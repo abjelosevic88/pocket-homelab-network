@@ -1,0 +1,34 @@
+# Pocket Network — every device on your home network (Go + SQLite). One container, one volume.
+# Host networking is needed to scan the LAN: a bridged container only sees its own Docker network.
+# The app then listens on PORT directly (no port mapping).
+services:
+  pocket-network:
+    image: ghcr.io/abjelosevic88/pocket-homelab-network:latest
+    container_name: pocket-network
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_RAW                       # the ARP sweep (without it: the slower ARP-table fallback)
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+      PORT: ${PORT:-8080}
+      BASE_URL: ${BASE_URL:-http://localhost:8080}
+      # SECURE_COOKIES: "true"          # behind HTTPS
+      # First admin (only used while the database has no users):
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      NOTIFY_URL: ${NOTIFY_URL:-}
+      # The first scan: the interface of the default route unless set.
+      # SCAN_INTERFACE: eth0
+      # SCAN_SUBNET: 192.168.1.0/24
+      # AdGuard Home as a first source (names and DNS activity):
+      ADGUARD_URL: ${ADGUARD_URL:-}
+      ADGUARD_USER: ${ADGUARD_USER:-}
+      ADGUARD_PASSWORD: ${ADGUARD_PASSWORD:-}
+      # Pocket Core: one sign-in and app links instead of tokens.
+      # CORE_URL: http://127.0.0.1:8179
+      # CORE_REGISTRATION_KEY: ${CORE_REGISTRATION_KEY}
+    volumes:
+      - ./data:/data
+      # This server's Tailscale peers (optional):
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock:ro

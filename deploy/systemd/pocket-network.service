@@ -1,0 +1,26 @@
+[Unit]
+Description=Pocket Network — every device on your home network
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pocket-network
+Group=pocket-network
+ExecStart=/usr/local/bin/pocket-network
+Environment=DATA_DIR=/var/lib/pocket-network
+Environment=PORT=8080
+Environment=BASE_URL=https://network.example.com
+Environment=SECURE_COOKIES=true
+# The ARP sweep needs raw sockets; without this it falls back to the ARP table.
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/pocket-network
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

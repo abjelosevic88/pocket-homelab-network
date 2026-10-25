@@ -1,0 +1,18 @@
+[Unit]
+Description=Pocket Network agent — scans this network and reports to Pocket Network
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+DynamicUser=true
+ExecStart=/usr/local/bin/pocket-network-agent -server https://network.example.com -token pna_REPLACE_ME
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

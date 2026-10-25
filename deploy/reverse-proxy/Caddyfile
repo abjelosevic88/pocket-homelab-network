@@ -1,0 +1,6 @@
+# Pocket Network behind Caddy. Homepage widgets, agents and linked apps send
+# their own bearer token to /api/*. With host networking the app listens on
+# the host's PORT directly.
+network.example.com {
+	reverse_proxy 127.0.0.1:8080
+}
