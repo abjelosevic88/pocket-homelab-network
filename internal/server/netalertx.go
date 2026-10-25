@@ -159,7 +159,7 @@ func (s *Server) importNetAlertX(ctx context.Context, uid int64, rd io.Reader) (
 			continue
 		}
 		name := strings.TrimSpace(strings.Trim(get("devName"), "\t"))
-		if naxPlaceholders[strings.ToLower(name)] {
+		if naxPlaceholders[strings.ToLower(name)] || netscan.CleanName(name) == "" {
 			name = ""
 		}
 		reviewed := get("devIsNew") == "0" || get("devNameSource") == "USER"

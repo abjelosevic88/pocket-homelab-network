@@ -70,7 +70,7 @@ func CleanName(n string) string {
 		}
 	}
 	switch strings.ToLower(n) {
-	case "", "localhost", "_gateway", "gateway", "unknown", "(none)":
+	case "", "localhost", "_gateway", "gateway", "unknown", "(none)", "<unknown>", "(unknown)", "(name not found)", "name not found", "null", "none":
 		return ""
 	}
 	return n

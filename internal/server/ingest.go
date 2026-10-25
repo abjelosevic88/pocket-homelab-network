@@ -244,6 +244,9 @@ func (r *ingestRun) apply(ctx context.Context, d *store.Device, o netscan.Observ
 	} else if !o.LastSeen.IsZero() && fmtTime(o.LastSeen) > d.LastSeen {
 		d.LastSeen = fmtTime(o.LastSeen)
 	}
+	if d.LastNetwork == "" && r.network != "" && kind != "adguard" {
+		d.LastNetwork = r.network
+	}
 	if o.IP != "" && (layer2(kind) && present || d.LastIP == "" && kind != "adguard") {
 		if layer2(kind) && d.LastIP != "" && d.LastIP != o.IP && d.ID > 0 {
 			r.event(ctx, d, "ip", "Address changed from "+d.LastIP+" to "+o.IP, o.IP, false)
