@@ -26,7 +26,7 @@ export function Sidebar({ onCreate, onNavigate, counts, scanning }: { onCreate: 
       <div className="sb-brand">
         <img src="/favicon.svg" alt="" className="sb-logo" />
         <span className="sb-title">{title !== 'Pocket Network' ? title : <>Pocket <b>Network</b></>}</span>
-        {status?.version && <span className="sb-version" title={`Version ${status.version}`}>{/^\d/.test(status.version) ? 'v' + status.version : status.version}</span>}
+        {status?.version && <span className="sb-version" title={`Version ${status.version}`}>{/^v?\d+\.\d+/.test(status.version) ? 'v' + status.version.replace(/^v/, '').replace(/[-+].*$/, '') : status.version}</span>}
       </div>
       <div className="create-split">
         <button type="button" className="btn primary create-btn grow" onClick={() => onCreate('scan')} disabled={scanning} title="Run every source now (S)">
