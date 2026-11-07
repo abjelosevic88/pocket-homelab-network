@@ -153,7 +153,8 @@ func (s *Server) seedDemo(ctx context.Context, owner int64) error {
 	}
 
 	start := now.Add(-62 * 24 * time.Hour).Truncate(time.Hour)
-	nasOutage := now.Add(-12 * 24 * time.Hour).Truncate(time.Hour).Add(3 * time.Hour)
+	oy, om, od := now.AddDate(0, 0, -12).Date()
+	nasOutage := time.Date(oy, om, od, 3, 0, 0, 0, now.Location())
 	for _, dd := range demoDevices {
 		n := nets[dd.network]
 		ip := fmt.Sprintf("%s%d", n.prefix, dd.ip)
