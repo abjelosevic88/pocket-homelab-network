@@ -424,7 +424,7 @@ func TestExportImportIdempotent(t *testing.T) {
 		t.Fatalf("export = %v", doc)
 	}
 	m := a.ok(a.alice, "POST", "/api/v1/import", doc)
-	if num(m, "created") != 0 || num(m, "updated") != 4 {
+	if num(m, "created") != 0 || num(m, "unchanged") != 4 {
 		t.Fatalf("import into the same account = %v", m)
 	}
 	m = a.ok(a.bob, "POST", "/api/v1/import", doc)

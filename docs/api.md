@@ -53,7 +53,8 @@ Kinds: `phone tablet laptop computer watch tv speaker console printer camera sma
 | | |
 |---|---|
 | `POST /import/netalertx` | Multipart `file` = NetAlertX `devices.csv`: `{created, updated, skipped}`; idempotent |
-| `GET /export.json`, `POST /import` | Your devices with identifiers and addresses; idempotent by MAC / Tailscale node |
+| `GET /export.json`, `POST /import` | Your devices with identifiers and addresses: `{created, updated, unchanged, skipped}`; idempotent by MAC / Tailscale node (by name and kind for a device kept by hand) |
+| `GET /pocket/portable` | Pocket Move can copy your devices out and bring them in (`move:export` / `move:import` links) |
 | `GET /export.csv` | The device list |
 | `GET /backup` | The whole database (admins) |
 

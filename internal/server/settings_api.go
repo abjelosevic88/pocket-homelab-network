@@ -433,16 +433,32 @@ func (s *Server) handleImportJSON(w http.ResponseWriter, r *http.Request) {
 	uid := actorID(ctx)
 	s.ingestMu.Lock()
 	defer s.ingestMu.Unlock()
-	counts := map[string]int{"created": 0, "updated": 0, "skipped": 0}
+	counts := map[string]int{"created": 0, "updated": 0, "unchanged": 0, "skipped": 0}
+	var mine []store.Device // loaded once, for devices with no MAC or Tailscale id
 	for _, ed := range doc.Devices {
 		var d *store.Device
+		stable := false
 		for _, id := range ed.IDs {
 			if id.Kind != "mac" && id.Kind != "tailscale" {
 				continue
 			}
+			stable = true
 			if found := s.store.DeviceByID(ctx, uid, id.Kind, id.Value); found > 0 {
 				d, _ = s.store.GetDevice(ctx, uid, found)
 				break
+			}
+		}
+		// a device kept by hand has no MAC: the same name and kind is the same
+		// device, so a second run of the same file adds nothing
+		if d == nil && !stable && strings.TrimSpace(ed.Name) != "" {
+			if mine == nil {
+				mine, _ = s.store.ListDevices(ctx, uid, store.DeviceFilter{})
+			}
+			for i := range mine {
+				if strings.EqualFold(strings.TrimSpace(mine[i].Name), strings.TrimSpace(ed.Name)) && mine[i].Kind == ed.Kind {
+					d, _ = s.store.GetDevice(ctx, uid, mine[i].ID)
+					break
+				}
 			}
 		}
 		in := ed.Device
@@ -458,7 +474,11 @@ func (s *Server) handleImportJSON(w http.ResponseWriter, r *http.Request) {
 			}
 			d = &in
 			counts["created"]++
+			if mine != nil {
+				mine = append(mine, in)
+			}
 		} else {
+			before := *d
 			for _, p := range []struct {
 				dst *string
 				v   string
@@ -471,11 +491,14 @@ func (s *Server) handleImportJSON(w http.ResponseWriter, r *http.Request) {
 				d.Review = in.Review
 			}
 			d.Watch, d.Pinned = d.Watch || in.Watch, d.Pinned || in.Pinned
-			if err := s.store.SaveDevice(ctx, d); err != nil {
+			if *d == before {
+				counts["unchanged"]++
+			} else if err := s.store.SaveDevice(ctx, d); err != nil {
 				counts["skipped"]++
 				continue
+			} else {
+				counts["updated"]++
 			}
-			counts["updated"]++
 		}
 		for _, id := range ed.IDs {
 			if (id.Kind == "mac" && netscan.NormalizeMAC(id.Value) != "") || id.Kind == "tailscale" {

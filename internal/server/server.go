@@ -247,6 +247,7 @@ func (s *Server) registerWithCore(ctx context.Context) error {
 		URL: s.cfg.CoreAppURL, PublicURL: s.cfg.BaseURL, HealthPath: "/healthz", EnvPrefix: "NETWORK",
 		Publishes: eventTopics,
 		Offers:    linkOffers,
+		Portable:  portable,
 		Uses:      append(linkUses(), core.InferenceUse()),
 		Services:  []core.ServiceUse{{Type: "adguard", Reason: "Names and DNS activity for each device from your AdGuard Home"}},
 	}
